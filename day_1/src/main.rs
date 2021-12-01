@@ -1,18 +1,24 @@
-use std::env;
-use std::fs;
+use std::fs::File;
+use std::io::{BufReader, BufRead};
+use std::u32::MAX;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let reader = BufReader::new(File::open("input.txt").expect("Cannot open"));
 
-    let query = &args[1];
-    let filename = &args[2];
+    let mut count = 0;
+    let mut prev: u32 = MAX;
+    for line in reader.lines() {
+        let num: u32 = match line.unwrap().parse() {
+            Ok(num) => num,
+            Err(_) => panic!("NaN")
+        };
 
-    println!("Searching for {}", query);
-    println!("In file {}", filename);
+        if num > prev {
+            count = count + 1;
+        }
 
+        prev = num;
+    }
 
-    let contents = fs::read_to_string(filename)
-        .expect("Something went wrong reading the file");
-
-    println!("With text:\n{}", contents);
+    println!("{}", count);    
 }
